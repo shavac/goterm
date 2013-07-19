@@ -3,6 +3,7 @@ package goterm
 import (
 	"encoding/binary"
 	"fmt"
+    "errors"
 	"syscall"
 	"unsafe"
 )
@@ -174,7 +175,7 @@ func NewTermSettings(fd int) (*TermSettings, error) {
 		uintptr(syscall.TCGETS),
 		uintptr(unsafe.Pointer(&tio.original)))
 	if errno != 0 {
-		return nil, syscall.Errno(errno)
+		return nil, errors.New(errno.Error())
 	}
 	copy(tio.current[:], tio.original[:])
 	tio.i, tio.o = tio.current[000:010], tio.current[010:020]
@@ -234,7 +235,7 @@ func (tio *TermSettings) Apply() error {
 		uintptr(syscall.TCSETS),
 		uintptr(unsafe.Pointer(&tio.current)))
 	if errno != 0 {
-		return syscall.Errno(errno)
+		return errors.New(errno.Error())
 	}
 	return nil
 }
